@@ -15,9 +15,7 @@ app.use(morgan("common"));
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.json({
-    message: "Thank you",
-  });
+  res.send("✅ Hello from Vercel + Express!");
 });
 
 // api routes
