@@ -26,3 +26,5 @@ app.use("/api/profile", verifyToken, require("./router/profile.route"));
 
 connectDB();
 app.listen(3000, () => console.log("Listening 3K"));
+
+module.exports = app;
