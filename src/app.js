@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const connectDB = require("./connect");
+const { verifyToken } = require("./middleware/token.middleware");
 dotenv.config();
 
 app.use(express.json());
@@ -20,7 +21,8 @@ app.get("/", (req, res) => {
 });
 
 // api routes
-app.use("/api/auth", require("./router/auth.route"));
+app.use("/api/auth", verifyToken, require("./router/auth.route"));
+app.use("/api/profile", verifyToken, require("./router/profile.route"));
 
 connectDB();
 app.listen(3000, () => console.log("Listening 3K"));

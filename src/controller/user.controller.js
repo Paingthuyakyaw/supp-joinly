@@ -1,6 +1,7 @@
 const UserSchema = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const ProfileSchema = require("../models/profile.model");
 require("dotenv").config();
 
 exports.registerController = async (req, res) => {
@@ -19,6 +20,13 @@ exports.registerController = async (req, res) => {
       email,
       password: hashPassword,
     });
+
+    const profile = await ProfileSchema.create({
+      user: user._id,
+      bio: "",
+      avatar_link: "",
+    });
+    user.profile = profile._id;
     user.save();
 
     res.status(201).json({
