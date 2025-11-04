@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 // api routes
-app.use("/api/auth", verifyToken, require("./router/auth.route"));
+app.use("/api/auth", require("./router/auth.route"));
 app.use("/api/profile", verifyToken, require("./router/profile.route"));
 
 connectDB();
