@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 
 // api routes
 app.use("/api/auth", require("./router/auth.route"));
-
+app.use("/api", require("./router/role.route"));
 connectDB();
 app.listen(3000, () => console.log("Listening 3K"));
 

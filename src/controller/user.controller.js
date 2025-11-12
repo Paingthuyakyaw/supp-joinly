@@ -39,7 +39,7 @@ exports.loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const existEmail = await UserSchema.findOne({ email });
+    const existEmail = await UserSchema.findOne({ email }).populate("roleId");
     if (!existEmail) {
       return res.status(400).json({ message: "Email or Password wrong " });
     }
@@ -50,7 +50,7 @@ exports.loginController = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: existEmail._id, username: existEmail.username },
+      { id: existEmail._id, role: existEmail.roleId },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -59,6 +59,7 @@ exports.loginController = async (req, res) => {
       data: {
         username: existEmail.username,
         email: existEmail.email,
+        role: existEmail.roleId.role,
         token,
       },
       message: "User Logged In Successfully",
