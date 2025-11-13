@@ -24,4 +24,26 @@ exports.registerSchema = checkSchema({
       errorMessage: "Password is required",
     },
   },
+  roleId: {
+    notEmpty: {
+      errorMessage: "Role ID is required",
+    },
+    isMongoId: {
+      errorMessage: "Invalid roleId format",
+    },
+  },
+});
+
+exports.loginSchema = checkSchema({
+  email: {
+    isEmail: {
+      errorMessage: "Invalid email address",
+    },
+    normalizeEmail: true,
+  },
+  password: {
+    notEmpty: {
+      errorMessage: "Password is required",
+    },
+  },
 });

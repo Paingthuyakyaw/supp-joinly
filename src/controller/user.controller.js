@@ -3,9 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
+// register api
 exports.registerController = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, roleId } = req.body;
 
     const existEmail = await UserSchema.findOne({ email });
     if (existEmail) {
@@ -18,6 +19,8 @@ exports.registerController = async (req, res) => {
       username,
       email,
       password: hashPassword,
+      status: "Pending",
+      roleId,
     });
 
     user.save();
@@ -35,13 +38,21 @@ exports.registerController = async (req, res) => {
   }
 };
 
+// login api
 exports.loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const existEmail = await UserSchema.findOne({ email }).populate("roleId");
+
+    if (existEmail?.status == "Pending") {
+      return res.status(400).json({
+        message: "You need to approve",
+      });
+    }
+
     if (!existEmail) {
-      return res.status(400).json({ message: "Email or Password wrong " });
+      return res.status(400).json({ message: "Email or Password wrong" });
     }
 
     const isPassword = bcrypt.compareSync(password, existEmail.password);
@@ -66,5 +77,22 @@ exports.loginController = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// getAllUser
+exports.getAllUser = async (req, res) => {
+  try {
+    const user = await UserSchema.find();
+
+    return res.status(200).json({
+      message: "User Fetched Successfully",
+      data: user,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Server Error",
+      error: err,
+    });
   }
 };

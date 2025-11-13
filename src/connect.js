@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const RoleSchema = require("./models/role.model");
-const createAdminRole = require("../util/default-role");
+const createAdminRole = require("../util/default");
 dotenv.config();
 
 const connectDB = async () => {
