@@ -10,11 +10,6 @@ const userSchema = new mongoose.Schema(
       enum: ["Pending", "Approve", "Reject"],
       default: "Pending",
     },
-    attendance: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Attendance",
-      required: true,
-    },
   },
   { timestamps: true }
 );

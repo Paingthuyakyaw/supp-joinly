@@ -14,10 +14,9 @@ exports.checkIn = async (req, res) => {
     const workEnd = dayjs().utc().hour(11).minute(0).second(0).millisecond(0);
 
     const userAttendance = await AttendanceSchema.findOne({
+      userId: req.user.id,
       date: dayjs().utc().startOf("day"),
     });
-
-    console.log(userAttendance, "att");
 
     if (userAttendance) {
       return res.status(400).json({
@@ -68,7 +67,31 @@ exports.checkIn = async (req, res) => {
 };
 
 // check-out
-exports.checkOut = async () => {};
+exports.checkOut = async (req, res) => {
+  try {
+    const { date } = req.body;
+
+    const checkInUser = await AttendanceSchema.findOne({
+      userId: req.user.id,
+      date: dayjs().utc().startOf("day"),
+    });
+
+    if (!checkInUser) {
+      return res.status(400).json({
+        message: "You're not attendance",
+      });
+    }
+
+    const data = checkInUser.updateOne({ userId: req.user.id, checkOut: date });
+
+    return res.status(200).json({ message: "0k", data });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Server Error",
+      error: err,
+    });
+  }
+};
 
 // attandance user
 exports.activeUser = async (req, res) => {
