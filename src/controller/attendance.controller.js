@@ -71,10 +71,16 @@ exports.checkOut = async (req, res) => {
   try {
     const { date } = req.body;
 
+    const todayStart = dayjs().utc().startOf("day");
+    const tomorrowStart = todayStart.add(1, "day");
+
     const checkInUser = await AttendanceSchema.findOne({
       userId: req.user.id,
-      date: dayjs().utc().startOf("day"),
-    });
+      date: {
+        $gte: todayStart,
+        $lt: tomorrowStart,
+      },
+    }).populate("userId", "username email");
 
     if (!checkInUser) {
       return res.status(400).json({
@@ -82,9 +88,16 @@ exports.checkOut = async (req, res) => {
       });
     }
 
-    const data = checkInUser.updateOne({ userId: req.user.id, checkOut: date });
+    if (checkInUser.checkOut) {
+      return res.status(400).json({
+        message: "You're already checkout",
+      });
+    }
 
-    return res.status(200).json({ message: "0k", data });
+    checkInUser.checkOut = date;
+    await checkInUser.save();
+
+    return res.status(200).json({ message: "0k", data: checkInUser });
   } catch (err) {
     return res.status(500).json({
       message: "Server Error",

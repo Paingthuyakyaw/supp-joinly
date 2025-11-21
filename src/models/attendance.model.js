@@ -37,38 +37,34 @@ attendanceSchema.pre("save", function (next) {
   const workEnd = dayjs().utc().hour(11).minute(0).second(0).millisecond(0);
 
   // const timeMid = "2025-11-16T05:30:00.000Z";
-  const checkIn = this.checkIn ? dayjs(this.checkIn) : null;
-  const checkOut = this.checkOut ? dayjs(this.checkOut) : null;
+  const checkIn = this.checkIn ? dayjs(this.checkIn).utc() : null;
+  const checkOut = this.checkOut ? dayjs(this.checkOut).utc() : null;
 
-  if (checkIn.isSame(workStart)) {
-    this.status == null;
-    return next();
-  }
-
-  // 1️⃣ ABSENT → No check-in & no check-out
+  // 1️⃣ Absent: no checkin + no checkout
   if (!checkIn && !checkOut) {
     this.status = "absent";
     return next();
   }
 
-  // 3️⃣ LATE → check-in is greater than workStart (late check-in)
-  if (checkIn && checkIn.isAfter(workStart)) {
+  // 2️⃣ Late: check-in after workStart
+  if (checkIn && workStart && checkIn.isAfter(workStart)) {
     this.status = "late";
     return next();
   }
 
-  // 2️⃣ HALF-DAY → Check-in but NO check-out
+  // 3️⃣ Half-day: check-in but no check-out
   if (checkIn && !checkOut) {
     this.status = "half-day";
     return next();
   }
 
-  if (checkIn && checkOut && checkOut.isBefore(workEnd)) {
+  // 4️⃣ Early leave: checkOut is before workEnd
+  if (checkIn && checkOut && workEnd && checkOut.isBefore(workEnd)) {
     this.status = "early-leave";
     return next();
   }
 
-  // 4️⃣ PRESENT → Normal check-in / check-out
+  // 5️⃣ Present: normal
   if (checkIn && checkOut) {
     this.status = "present";
     return next();
