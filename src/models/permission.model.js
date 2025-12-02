@@ -5,11 +5,16 @@ const permissionSchema = new Schema({
     type: String,
     required: true,
   },
-  actions: [
+  children: [
     {
-      type: String,
-      enum: ["create", "read", "update", "delete"],
-      required: true,
+      menuCode: { type: String, required: true },
+      actions: [
+        {
+          type: String,
+          enum: ["create", "read", "update", "delete"],
+          required: true,
+        },
+      ],
     },
   ],
   scope: {
